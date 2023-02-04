@@ -1,0 +1,75 @@
+﻿@page "/employees"
+
+@attribute [Authorize]
+@using BlazorEmployeeManagementApp2.Shared.Models;
+@inject HttpClient http
+@inject IEmployeeService EmployeeService
+
+<h3>Employee List</h3>
+@*<p>Selected Employee Count: @selectedEmployeeCount</p>*@
+<input type="checkbox" id="_showFooter" @bind="showFooter" />
+<label for="_showFooter">Show Actions</label>
+<div class="row">
+    <div class="col-md-6">
+        <a href="addemployee" class="btn btn-primary" role="button">
+            <i class="fas fa-user-plus"></i> Add Employee
+        </a>
+    </div>
+</div>
+<br />
+@if (employees == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="card-deck row">
+        @foreach (var employee in employees)
+        {
+            <DisplayEmployee Employee="employee" ShowFooter="showFooter" 
+                OnEmployeeSelection="EmployeeSelectionChanged"
+                OnEmployeeDelete="EmployeeListChanged"></DisplayEmployee>
+        }
+    </div>
+}
+
+@code {
+    private IEnumerable<Employee>? employees;
+    public bool showFooter = true;
+    protected int selectedEmployeeCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEmployees();
+    }
+
+    private async Task LoadEmployees()
+    {
+        //employees = await http.GetFromJsonAsync<Employee[]>("api/Employee/GetEmployees");
+        employees = await EmployeeService.GetEmployees();
+    }
+
+    protected void EmployeeSelectionChanged(bool isSelected)
+    {
+        if (isSelected)
+        {
+            selectedEmployeeCount++;
+        }
+        else
+        {
+            selectedEmployeeCount--;    
+        }
+    }
+
+    protected async void EmployeeListChanged(bool flag)
+    {
+        if (flag)
+        {
+            await LoadEmployees();
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        }
+    }
+}

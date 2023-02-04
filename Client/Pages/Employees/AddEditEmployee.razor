@@ -1,0 +1,162 @@
+﻿@page "/addemployee"
+@page "/editemployee/{Id:int}"
+
+@attribute [Authorize]
+@using BlazorEmployeeManagementApp2.Shared.Models;
+@inject IEmployeeService EmployeeService
+@inject IDepartmentService DepartmentService
+@using System.Net.Http.Headers;
+@using System.Text;
+@using System.Text.Json;
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<h3>@HeaderText</h3>
+<hr />
+@if (employee == null || departments == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <EditForm Model="@employee" OnValidSubmit="UpdateFormData">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group row">
+            <label for="firstName" class="col-sm-2 col-form-label">First Name</label>
+            <div class="col-sm-4">
+                <InputText @bind-Value="employee.FirstName" class="form-control" placeholder="First Name" id="firstName"></InputText>
+                <ValidationMessage For="@(()=>employee.FirstName)" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="lastName" class="col-sm-2 col-form-label">Last Name</label>
+            <div class="col-sm-4">
+                <InputText @bind-Value="employee.LastName" class="form-control" placeholder="Last Name" id="lastName"></InputText>
+                <ValidationMessage For="@(()=>employee.LastName)" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="email" class="col-sm-2 col-form-label">Email</label>
+            <div class="col-sm-4">
+                <InputText @bind-Value="employee.Email" class="form-control" placeholder="Email" id="email"></InputText>
+                <ValidationMessage For="@(()=>employee.Email)" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="department" class="col-sm-2 col-form-label">Department</label>
+            <div class="col-sm-4"> 
+                <InputSelect @bind-Value="employee.DepartmentId" id="department" class="form-control">
+                    @foreach(var dept in departments)
+                    {
+                        <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="gender" class="col-sm-2 col-form-label">Gender</label>
+            <div class="col-sm-4">
+                <InputSelect @bind-Value="employee.Gender" id="gender" class="form-control">
+                    @foreach (var gen in Enum.GetValues(typeof(Gender)))
+                    {
+                        <option value="@gen">@gen</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="dob" class="col-sm-2 col-form-label">Date of Birth</label>
+            <div class="col-sm-4">
+                <InputDate @bind-Value="employee.DateOfBrith" class="form-control" placeholder="Date of Birth" id="dob"></InputDate>
+                <ValidationMessage For="@(()=>employee.DateOfBrith)" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="profilePicture" class="col-sm-2 col-form-label">Profile Picture</label>
+            <div class="col-sm-4">
+                <InputFile OnChange="@OnInputFileChange" class="form-control" id="profilePicture" accept=".png,.jpg,.jpeg"></InputFile>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
+}
+
+@code {
+    private Employee? employee;
+    private IEnumerable<Department>? departments;
+    private StreamContent fileContent;
+    private string fileName;
+    private UploadResult upldRes = new UploadResult();
+    string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+    private string HeaderText = "Add Employee";
+
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            HeaderText = "Edit Employee";
+            //employee = await http.GetFromJsonAsync<Employee>("api/Employee/GetEmployee/" + Id);
+            employee = await EmployeeService.GetEmployee(Id);
+        }
+        else
+        {
+            employee = new Employee
+            {
+                DepartmentId = 1,
+                DateOfBrith = DateTime.Now
+            };
+        }
+        //departments = await http.GetFromJsonAsync<List<Department>>("api/Department/GetDepartments");
+        departments = await DepartmentService.GetDepartments();
+    }
+
+    protected async Task UpdateFormData()
+    {
+        if (!string.IsNullOrEmpty(fileName))
+        {
+            //Delete Image if Exists
+            if (Id != 0)
+            {
+                await EmployeeService.DeleteEmployeeImage(employee.PhotoPath);
+            }
+
+            //Upload Image
+            using var content = new MultipartFormDataContent();
+            content.Add(content: fileContent, name: "\"file\"", fileName: fileName);
+            //var res = await http.PostAsync("api/Employee/UploadEmployeeImage", content);
+            var res = await EmployeeService.UploadEmployeeImage(content);
+
+            var uploadedImagePath = res.Content.ReadFromJsonAsync<UploadResult>();
+            upldRes = uploadedImagePath.Result;
+
+            employee.PhotoPath = upldRes.UploadFilePath;
+        }
+
+        if (Id != 0)
+        {
+            //await http.PutAsJsonAsync("api/Employee/UpdateEmployee", employee);
+            await EmployeeService.UpdateEmployee(employee);
+        }
+        else
+        {
+            //await http.PostAsJsonAsync("api/Employee/AddEmployee", employee);
+            await EmployeeService.CreateEmployee(employee);
+        }
+        navigationManager.NavigateTo("/employees");
+
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        long maxFileSize = 1024 * 1024 * 10; //10 MB
+        fileContent = new StreamContent(e.File.OpenReadStream(maxFileSize));
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(e.File.ContentType);
+        fileName = e.File.Name;
+    }
+
+}

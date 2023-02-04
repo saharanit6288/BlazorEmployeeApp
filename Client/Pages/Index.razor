@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject HttpClient http
+
+<PageTitle>Index</PageTitle>
+
+<h1>Employee Management!</h1>
+
+Welcome to Employee Management. Its CRUD operations with FileUpload, Delete Modal popup and Authentication/Authorization. 
+
+
+@*<h1>Upload Files</h1>
+
+<InputFile OnChange="OnInputFileChange" multiple />*@
+
+@code {
+    //private int maxAllowedFiles = 3;
+    //private long maxfileSize = 1024 * 1024 * 10;//10 MB
+
+    //private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    //{
+    //    using var content = new MultipartFormDataContent();
+
+    //    foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+    //    {
+    //        var fileContent = new StreamContent(file.OpenReadStream(maxfileSize));
+    //        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+    //        content.Add(
+    //            content: fileContent,
+    //            name: "\"files\"",
+    //            fileName: file.Name
+    //        );
+    //    }
+
+    //    await http.PostAsync("api/Upload/UploadFiles", content);
+    //}
+}

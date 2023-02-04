@@ -1,0 +1,67 @@
+﻿@using BlazorEmployeeManagementApp2.Shared.Models;
+@inject HttpClient http
+@inject IEmployeeService EmployeeService
+
+<div class="card m-3 col-3" style="min-width: 18rem; max-width:30.5%;">
+    <div class="card-header">
+        @*<input type="checkbox" checked="@IsSelected" @onchange="CheckBoxChanged" />*@
+        <h5>@Employee.FirstName @Employee.LastName</h5>
+    </div>
+    <img class="card-img-top imageThumbnail" src="@Employee.PhotoPath" />
+    @if (ShowFooter)
+    {
+        <div class="card-footer text-center">
+            <a href="/employeedetails/@Employee.EmployeeId" class="btn btn-primary m-1">View</a>
+
+            <a href="/editemployee/@Employee.EmployeeId" class="btn btn-primary m-1">Edit</a>
+
+            <input type="submit" value="Delete" class="btn btn-danger" @onclick="RemoveUser" />
+        </div>
+    }
+</div>
+
+<ConfirmModal @ref="modal" ConfirmationTitle="Confirm Delete"
+              ConfirmationMessage="@($"Are you sure you want to delete \"{Employee.FirstName}\"?")"
+              ConfirmationChanged="OnConfirmDelete"></ConfirmModal>
+
+@code {
+    [Parameter]
+    public Employee Employee { get; set; }
+
+    [Parameter]
+    public bool ShowFooter { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnEmployeeSelection { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnEmployeeDelete { get; set; }
+
+    protected bool IsSelected { get; set; } = false;
+
+    private ConfirmModal? modal { get; set; }
+
+    protected async Task CheckBoxChanged(ChangeEventArgs e)
+    {
+        IsSelected = (bool)e.Value;
+        await OnEmployeeSelection.InvokeAsync(IsSelected);
+
+    }
+
+    protected void RemoveUser()
+    {
+        modal.Show();
+    }
+
+    protected async Task OnConfirmDelete(bool isConfirmed)
+    {
+        if (isConfirmed)
+        {
+            //await http.DeleteAsync("api/Employee/DeleteEmployee/" + Employee.EmployeeId);
+            await EmployeeService.DeleteEmployeeImage(Employee.PhotoPath);
+            await EmployeeService.DeleteEmployee(Employee.EmployeeId);
+            await OnEmployeeDelete.InvokeAsync(true);
+        }
+    }
+
+}

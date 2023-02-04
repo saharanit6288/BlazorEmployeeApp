@@ -1,0 +1,89 @@
+﻿@page "/employeedetails/{Id:int}"
+
+@attribute [Authorize]
+@using BlazorEmployeeManagementApp2.Shared.Models;
+@inject IEmployeeService EmployeeService
+@inject HttpClient http
+@inject IJSRuntime JsRuntime
+@inject NavigationManager navigationManager
+
+@if (employee == null || employee.Department == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="row justify-content-center m-3">
+        <div class="col-sm-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1>@employee.FirstName @employee.LastName</h1>
+                </div>
+
+                <div class="card-body text-center">
+                    <img class="card-img-top" src="@employee.PhotoPath" />
+
+                    <h4>Employee ID : @employee.EmployeeId</h4>
+                    <h4>Email : @employee.Email</h4>
+                    <h4>Department : @employee.Department.DepartmentName</h4>
+                </div>
+                
+                <div class="card-footer text-center @CssClass">
+                    <a href="/employees" class="btn btn-primary">Back</a>
+                    <a href="/editemployee/@employee.EmployeeId" class="btn btn-primary">Edit</a>
+                    <input type="submit" value="Delete" class="btn btn-danger" @onclick="(async () => await RemoveUser(employee))" />
+                </div>
+                <button class="btn btn-primary" @onclick="@Button_Click">@ButtonText</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Employee employee = new Employee();
+    protected string ButtonText = "Hide Actions";
+    protected string CssClass = "";
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Button_Click();
+        await LoadEmployee();
+    }
+
+    private async Task LoadEmployee()
+    {
+        //employee = await http.GetFromJsonAsync<Employee>("api/Employee/GetEmployee/" + Id);
+        employee = await EmployeeService.GetEmployee(Id);
+    }
+
+    protected void Button_Click()
+    {
+        if (ButtonText == "Hide Actions")
+        {
+            ButtonText = "Show Actions";
+            CssClass = "hide-footer";
+        }
+        else 
+        {
+            ButtonText = "Hide Actions";
+            CssClass = "";
+        }
+
+    }
+
+    protected async Task RemoveUser(Employee employee)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the employee '{employee.FirstName} {employee.LastName}'?");
+        if (confirmed)
+        {
+            //await http.DeleteAsync("api/Employee/DeleteEmployee/" + employee.EmployeeId);
+            await EmployeeService.DeleteEmployeeImage(employee.PhotoPath);
+            await EmployeeService.DeleteEmployee(employee.EmployeeId);
+            navigationManager.NavigateTo("/employees");
+        }
+
+    }
+}

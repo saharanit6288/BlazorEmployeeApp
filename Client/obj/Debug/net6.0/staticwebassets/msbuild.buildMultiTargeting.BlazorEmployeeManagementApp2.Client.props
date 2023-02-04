@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\BlazorEmployeeManagementApp2.Client.props" />
+</Project>

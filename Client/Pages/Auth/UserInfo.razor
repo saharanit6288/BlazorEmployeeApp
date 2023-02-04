@@ -1,0 +1,53 @@
+﻿@page "/userinfo"
+
+@attribute [Authorize]
+@using BlazorEmployeeManagementApp2.Shared.AuthModels;
+@inject IAuthService AuthService
+
+<h3>User Info</h3>
+
+@if (userDetail == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="row m-3">
+        <div class="col-sm-8">
+            <table class="col-md-12 table-striped align-middle table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Email ID :</th>
+                        <td>@userDetail.Email</td>
+                    </tr>
+                    <tr>
+                        <th>Email Confirmed :</th>
+                        <td>@userDetail.EmailConfirmed</td>
+                    </tr>
+                    <tr>
+                        <th>User Name :</th>
+                        <td>@userDetail.UserName</td>
+                    </tr>
+                    <tr>
+                        <th>Phone No :</th>
+                        <td>@userDetail.PhoneNumber</td>
+                    </tr>
+                    <tr>
+                        <th>Phone Confirmed :</th>
+                        <td>@userDetail.PhoneNumberConfirmed</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    private UserDetails userDetail = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        userDetail = await AuthService.GetUserInfo();
+    }
+
+}
