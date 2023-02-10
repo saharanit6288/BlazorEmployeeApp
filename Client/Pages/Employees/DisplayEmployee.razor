@@ -58,7 +58,7 @@
         if (isConfirmed)
         {
             //await http.DeleteAsync("api/Employee/DeleteEmployee/" + Employee.EmployeeId);
-            await EmployeeService.DeleteEmployeeImage(Employee.PhotoPath);
+            //await EmployeeService.DeleteEmployeeImage(Employee.PhotoPath);
             await EmployeeService.DeleteEmployee(Employee.EmployeeId);
             await OnEmployeeDelete.InvokeAsync(true);
         }

@@ -85,10 +85,13 @@ else
 @code {
     private Employee? employee;
     private IEnumerable<Department>? departments;
-    private StreamContent fileContent;
     private string fileName;
-    private UploadResult upldRes = new UploadResult();
-    string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+    
+    //private StreamContent fileContent;
+    //private UploadResult upldRes = new UploadResult();
+    //string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+    IBrowserFile selectedFile;
 
     private string HeaderText = "Add Employee";
 
@@ -119,22 +122,31 @@ else
     {
         if (!string.IsNullOrEmpty(fileName))
         {
-            //Delete Image if Exists
-            if (Id != 0)
-            {
-                await EmployeeService.DeleteEmployeeImage(employee.PhotoPath);
-            }
-
             //Upload Image
-            using var content = new MultipartFormDataContent();
-            content.Add(content: fileContent, name: "\"file\"", fileName: fileName);
-            //var res = await http.PostAsync("api/Employee/UploadEmployeeImage", content);
-            var res = await EmployeeService.UploadEmployeeImage(content);
+            Stream stream = selectedFile.OpenReadStream();
+            MemoryStream ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            stream.Close();
 
-            var uploadedImagePath = res.Content.ReadFromJsonAsync<UploadResult>();
-            upldRes = uploadedImagePath.Result;
+            employee.FileName = fileName;
+            employee.FileContent = ms.ToArray();
+            ms.Close();
 
-            employee.PhotoPath = upldRes.UploadFilePath;
+            //Delete Image if Exists
+            //if (Id != 0)
+            //{
+            //    await EmployeeService.DeleteEmployeeImage(employee.PhotoPath);
+            //}
+
+            //using var content = new MultipartFormDataContent();
+            //content.Add(content: fileContent, name: "\"file\"", fileName: fileName);
+            ////var res = await http.PostAsync("api/Employee/UploadEmployeeImage", content);
+            //var res = await EmployeeService.UploadEmployeeImage(content);
+
+            //var uploadedImagePath = res.Content.ReadFromJsonAsync<UploadResult>();
+            //upldRes = uploadedImagePath.Result;
+
+            //employee.PhotoPath = upldRes.UploadFilePath;
         }
 
         if (Id != 0)
@@ -153,10 +165,13 @@ else
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        long maxFileSize = 1024 * 1024 * 10; //10 MB
-        fileContent = new StreamContent(e.File.OpenReadStream(maxFileSize));
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue(e.File.ContentType);
+        selectedFile = e.File;
         fileName = e.File.Name;
+        this.StateHasChanged();
+        //long maxFileSize = 1024 * 1024 * 10; //10 MB
+        //fileContent = new StreamContent(e.File.OpenReadStream(maxFileSize));
+        //fileContent.Headers.ContentType = new MediaTypeHeaderValue(e.File.ContentType);
+        
     }
 
 }

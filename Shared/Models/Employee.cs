@@ -28,6 +28,13 @@ namespace BlazorEmployeeManagementApp2.Shared.Models
         public int DepartmentId { get; set; }
         public Gender Gender { get; set; }
         public string? PhotoPath { get; set; }
+
+        [NotMapped]
+        public string? FileName { get; set; }
+
+        [NotMapped]
+        public byte[]? FileContent { get; set; }
+
         public virtual Department? Department { get; set; }
     }
 }

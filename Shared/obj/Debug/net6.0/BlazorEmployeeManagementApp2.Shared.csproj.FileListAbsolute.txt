@@ -10,3 +10,15 @@ C:\Users\Ranit Saha\source\repos\BlazorEmployeeManagementApp2\Shared\obj\Debug\n
 C:\Users\Ranit Saha\source\repos\BlazorEmployeeManagementApp2\Shared\obj\Debug\net6.0\refint\BlazorEmployeeManagementApp2.Shared.dll
 C:\Users\Ranit Saha\source\repos\BlazorEmployeeManagementApp2\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.pdb
 C:\Users\Ranit Saha\source\repos\BlazorEmployeeManagementApp2\Shared\obj\Debug\net6.0\ref\BlazorEmployeeManagementApp2.Shared.dll
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\bin\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.deps.json
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\bin\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.dll
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\bin\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.pdb
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.csproj.AssemblyReference.cache
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.AssemblyInfoInputs.cache
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.AssemblyInfo.cs
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.dll
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\refint\BlazorEmployeeManagementApp2.Shared.dll
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\BlazorEmployeeManagementApp2.Shared.pdb
+C:\Users\Ranit Saha\source\repos\BlazorEmployeeApp\Shared\obj\Debug\net6.0\ref\BlazorEmployeeManagementApp2.Shared.dll

@@ -67,6 +67,17 @@ namespace BlazorEmployeeManagementApp2.Server.Controllers
                     return BadRequest(ModelState);
                 }
 
+                //Upload File
+                if (!string.IsNullOrEmpty(employee.FileName))
+                {
+                    var path = Path.Combine(_env.ContentRootPath, "images", employee.FileName);
+                    var fs = System.IO.File.Create(path);
+                    fs.Write(employee.FileContent, 0, employee.FileContent.Length);
+                    fs.Close();
+
+                    employee.PhotoPath = Path.Combine("images", employee.FileName);
+                }
+
                 var result = await _employeeRepository.AddEmployee(employee);
 
                 return Ok(result);
@@ -95,7 +106,28 @@ namespace BlazorEmployeeManagementApp2.Server.Controllers
                     return NotFound("Employee Not Found");
                 }
 
-                
+                //Upload File
+                if (!string.IsNullOrEmpty(employee.FileName))
+                {
+                    //Delete File
+                    if (!string.IsNullOrEmpty(emp.PhotoPath))
+                    {
+                        var pathDel = Path.Combine(_env.ContentRootPath, emp.PhotoPath);
+
+                        if (System.IO.File.Exists(pathDel))
+                        {
+                            System.IO.File.Delete(pathDel);
+                        }
+                    }
+
+                    var path = Path.Combine(_env.ContentRootPath, "images", employee.FileName);
+                    var fs = System.IO.File.Create(path);
+                    fs.Write(employee.FileContent, 0, employee.FileContent.Length);
+                    fs.Close();
+
+                    employee.PhotoPath = Path.Combine("images", employee.FileName);
+                }
+
                 var result = await _employeeRepository.UpdateEmployee(employee);
 
                 return Ok(result);
@@ -104,40 +136,6 @@ namespace BlazorEmployeeManagementApp2.Server.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
-
-        [HttpPost]
-        [Route("UploadEmployeeImage")]
-        public ActionResult<UploadResult> UploadEmployeeImage(IFormFile file)
-        {
-            var UploadResult = new UploadResult();
-            string fileName = file.FileName;
-            var path = Path.Combine(_env.ContentRootPath, "images", fileName);
-
-            using FileStream fs = new(path, FileMode.Create);
-            file.CopyTo(fs);
-
-            UploadResult.UploadFilePath = Path.Combine("images", fileName);
-
-            return Ok(UploadResult);
-        }
-
-        [HttpPost]
-        [Route("DeleteEmployeeImage")]
-        public ActionResult<UploadResult> DeleteEmployeeImage([FromBody] string fileName)
-        {
-            var UploadResult = new UploadResult();
-            
-            var path = Path.Combine(_env.ContentRootPath, fileName);
-
-            if (System.IO.File.Exists(path))
-            {
-                System.IO.File.Delete(path);
-            }
-
-            UploadResult.UploadFilePath = "";
-
-            return Ok(UploadResult);
         }
 
         [HttpDelete]
@@ -153,7 +151,18 @@ namespace BlazorEmployeeManagementApp2.Server.Controllers
                     return NotFound("Employee Not Found");
                 }
 
-                 _employeeRepository.DeleteEmployee(id);
+                //Delete File
+                if (!string.IsNullOrEmpty(emp.PhotoPath))
+                {
+                    var path = Path.Combine(_env.ContentRootPath, emp.PhotoPath);
+
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                }
+
+                _employeeRepository.DeleteEmployee(id);
 
                 return Ok();
             }
@@ -162,6 +171,42 @@ namespace BlazorEmployeeManagementApp2.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        //[HttpPost]
+        //[Route("UploadEmployeeImage")]
+        //public ActionResult<UploadResult> UploadEmployeeImage(IFormFile file)
+        //{
+        //    var UploadResult = new UploadResult();
+        //    string fileName = file.FileName;
+        //    var path = Path.Combine(_env.ContentRootPath, "images", fileName);
+
+        //    using FileStream fs = new(path, FileMode.Create);
+        //    file.CopyTo(fs);
+
+        //    UploadResult.UploadFilePath = Path.Combine("images", fileName);
+
+        //    return Ok(UploadResult);
+        //}
+
+        //[HttpPost]
+        //[Route("DeleteEmployeeImage")]
+        //public ActionResult<UploadResult> DeleteEmployeeImage([FromBody] string fileName)
+        //{
+        //    var UploadResult = new UploadResult();
+
+        //    var path = Path.Combine(_env.ContentRootPath, fileName);
+
+        //    if (System.IO.File.Exists(path))
+        //    {
+        //        System.IO.File.Delete(path);
+        //    }
+
+        //    UploadResult.UploadFilePath = "";
+
+        //    return Ok(UploadResult);
+        //}
+
+
 
         [HttpGet]
         [Route("SearchEmployees/{name}/{gender?}")]
