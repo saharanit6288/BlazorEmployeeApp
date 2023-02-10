@@ -70,6 +70,11 @@ namespace BlazorEmployeeManagementApp2.Server.Controllers
                 //Upload File
                 if (!string.IsNullOrEmpty(employee.FileName))
                 {
+                    //If we want to create wwwroot folder in Server project
+                    //if (string.IsNullOrWhiteSpace(_env.WebRootPath))
+                    //{
+                    //    _env.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    //}
                     var path = Path.Combine(_env.ContentRootPath, "images", employee.FileName);
                     var fs = System.IO.File.Create(path);
                     fs.Write(employee.FileContent, 0, employee.FileContent.Length);
